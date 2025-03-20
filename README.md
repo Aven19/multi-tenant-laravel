@@ -1,73 +1,101 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Multi-Tenant Application
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
+This project is a **multi-tenant Laravel application** with separate databases for tenants and a central **landlord** database. It allows each tenant to have its own isolated data while the landlord database manages tenant information.
 
-## About Laravel
+## Tech Stack
+- Laravel Framework
+- PostgreSQL / MySQL
+- Laravel Tenancy Package (Stancl/Tenancy)
+- Docker (Optional)
+- Redis (Optional)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Installation
+### Prerequisites
+Ensure you have the following installed:
+- PHP (>= 8.0)
+- Composer
+- MySQL / PostgreSQL
+- Laravel  
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Setup Instructions
+1. **Clone the repository:**
+   ```sh
+   git clone <repository-url>
+   cd project-directory
+   ```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. **Install dependencies:**
+   ```sh
+   composer install
+   ```
 
-## Learning Laravel
+3. **Create and configure `.env` file:**
+   ```sh
+   cp .env.example .env
+   ```
+   Update database configurations for landlord and tenants:
+   ```env
+   DB_CONNECTION=pgsql
+   DB_DATABASE=landlord_db
+   DB_USERNAME=root
+   DB_PASSWORD=secret
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+4. **Run migrations:**
+   ```sh
+   php artisan migrate --database=landlord
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+5. **Seed the landlord database (optional):**
+   ```sh
+   php artisan db:seed --class=LandlordSeeder
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+6. **Create a new tenant:**
+   ```sh
+   php artisan tenants:create example.com
+   ```
+   This command will:
+   - Create a tenant entry in the landlord database
+   - Provision a new tenant database
+   - Run tenant migrations
 
-## Laravel Sponsors
+7. **Run the application:**
+   ```sh
+   php artisan serve
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Multi-Tenancy Management
+- **Creating a Tenant**
+  ```sh
+  php artisan tenants:create tenant1.com
+  ```
+- **Switching to a Tenant Database**
+  ```php
+  tenancy()->initialize($tenant);
+  ```
+- **Running Migrations for Tenants**
+  ```sh
+  php artisan tenants:migrate
+  ```
+- **Rolling Back Migrations for Tenants**
+  ```sh
+  php artisan tenants:migrate:rollback
+  ```
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Deployment
+1. Configure environment variables for production.
+2. Use a queue system for tenant provisioning.
+3. Set up a load balancer (if required).
+4. Configure domain handling for tenant resolution.
 
 ## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository.
+2. Create a feature branch.
+3. Commit changes and push.
+4. Open a pull request.
 
 ## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
-
-
-php artisan migrate --database=landlord --path=database/migrations/landlord
-
-php artisan migrate:fresh --database=landlord --path=database/migrations/landlord --seed
+This project is licensed under the MIT License.
 
